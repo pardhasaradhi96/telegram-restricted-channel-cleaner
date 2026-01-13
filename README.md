@@ -3,7 +3,7 @@ A fast Python script that scans your Telegram account, detects channels blocked 
 
 problem i face : 
 When Telegram’s channel limit is reached, it suggests leaving inactive channels, but it does not highlight channels blocked due to copyright infringement.
-This code removes such unusable (copyrighted) channels, freeing up join slots without losing any useful content.
+This code removes such unusable channels, freeing up join slots without losing any useful content.
 
 ## 🔧 Setup Instructions
 
