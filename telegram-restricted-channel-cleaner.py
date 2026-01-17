@@ -2,39 +2,40 @@ import asyncio
 from telethon import TelegramClient
 from telethon.tl.types import Channel
 
-# 🔹 YOUR API DETAILS
-api_id =         # your api_id
-api_hash = ""  # your api_hash
+api_id =                  # <-- put your api_id (INT)
+api_hash = ""   # <-- put your api_hash (STRING)
 session_name = "telegram_session"
 
-TARGET_MESSAGE = "This channel is unavailable due to copyright infringement."
+BLOCK_MESSAGES = {
+    "This channel is unavailable due to copyright infringement.",
+    "This channel can’t be displayed because it violated Telegram's Terms of Service."
+}
 
 async def main():
     client = TelegramClient(session_name, api_id, api_hash)
     await client.start()
 
-    print("\n🔍 Scanning for copyright-blocked channels...\n")
+    print("\n🔍 Scanning for blocked channels...\n")
 
-    blocked_channels = []  # list of (id, access_hash, name)
+    blocked_channels = {}
 
     async for dialog in client.iter_dialogs():
         if not isinstance(dialog.entity, Channel):
             continue
 
         channel = dialog.entity
-        name = dialog.name
+        name = dialog.name or "Unknown"
 
         if getattr(channel, "restricted", False):
             for r in channel.restriction_reason:
-                if r.reason == "copyright" and r.text == TARGET_MESSAGE:
-                    print(f"❌ {name}  |  ID: {channel.id}")
-                    blocked_channels.append(
-                        (channel.id, channel.access_hash, name)
-                    )
+                if r.text in BLOCK_MESSAGES:
+                    if channel.id not in blocked_channels:
+                        blocked_channels[channel.id] = name
+                        print(f"❌ {name}  |  ID: {channel.id}")
                     break
 
     if not blocked_channels:
-        print("\n✅ No copyright-blocked channels found.")
+        print("\n✅ No blocked channels found.")
         await client.disconnect()
         return
 
@@ -46,7 +47,7 @@ async def main():
 
     if choice == "yes":
         print("\n🚪 Leaving channels...\n")
-        for ch_id, access_hash, name in blocked_channels:
+        for ch_id, name in blocked_channels.items():
             try:
                 await client.delete_dialog(ch_id)
                 print(f"✔ Left: {name} (ID: {ch_id})")
