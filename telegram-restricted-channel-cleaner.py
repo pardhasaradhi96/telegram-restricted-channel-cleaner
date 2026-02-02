@@ -1,7 +1,7 @@
 import asyncio
 from telethon import TelegramClient
 from telethon.tl.types import Channel
-
+#https://my.telegram.org/ 
 api_id =                  # <-- put your api_id (INT)
 api_hash = ""   # <-- put your api_hash (STRING)
 session_name = "telegram_session"
@@ -59,3 +59,4 @@ async def main():
     await client.disconnect()
 
 asyncio.run(main())
+
